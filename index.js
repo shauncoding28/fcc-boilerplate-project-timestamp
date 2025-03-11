@@ -25,16 +25,21 @@ app.get("/api/hello", function (req, res) {
 });
 
 
-//returns unix timestamp
+//returns unix and utc timestamp
 app.get("/api/:date", (req, res) => {
   const date = req.params.date;
-  const unixDate = new Date(date).getTime();
+  const parsedDate = new Date(date);
 
-  if (isNaN(unixDate)) {
+  if (isNaN(parsedDate.getTime())) {
     res.json({ error: "Date not valid" });
   }
-  res.status(200).json({ unix: unixDate });
+
+  const unixDate = parsedDate.getTime();
+  const utcDate = parsedDate.toUTCString();
+
+  res.status(200).json({ unix: unixDate, utc: utcDate });
 });
+
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
