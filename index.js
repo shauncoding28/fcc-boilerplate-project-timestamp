@@ -26,18 +26,37 @@ app.get("/api/hello", function (req, res) {
 
 
 //returns unix and utc timestamp
-app.get("/api/:date", (req, res) => {
-  const date = req.params.date;
-  const parsedDate = new Date(date);
+app.get("/api/:date?", (req, res) => {
+  const dateParam = req.params.date;
+  let parsedDate;
 
+  //creates date if none is provided
+  if (!dateParam) {
+    parsedDate = new Date();
+  } else {
+    // Checks if dateParam is a number
+    const isUnixTimestamp = /^\d+$/.test(dateParam);
+    if (isUnixTimestamp) {
+      parsedDate = new Date(parseInt(dateParam, 10));
+    } else {
+      parsedDate = new Date(dateParam);
+    }
+  };
+
+
+  // Checks date is valid
   if (isNaN(parsedDate.getTime())) {
-    res.json({ error: "Date not valid" });
+    return res.json({ error: "Invalid Date" });
   }
 
+  //console.log('Parsed Date:', parsedDate);
+  //console.log('Unix Timestamp:', parsedDate.getTime());
+  // Converts to unix and utc
   const unixDate = parsedDate.getTime();
   const utcDate = parsedDate.toUTCString();
 
-  res.status(200).json({ unix: unixDate, utc: utcDate });
+  // Send the response with both Unix and UTC dates
+  return res.json({ unix: unixDate, utc: utcDate });
 });
 
 
